@@ -1,0 +1,63 @@
+import streamlit as st
+import pandas as pd
+import tkinter as tk
+from tkinter import filedialog
+import re
+
+def check_file_extension(file_path):
+    if re.search(r"\.xlsx$", file_path, re.IGNORECASE):
+        return "xlsx"
+    elif re.search(r"\.csv$", file_path, re.IGNORECASE):
+        return "csv"
+    else:
+        return None
+
+def upload_file():
+    filetypes = [("Arquivos CSV", "*.csv"), ("Arquivo XLSX", "*.xlsx")]
+    file_path = filedialog.askopenfilename(filetypes=filetypes)
+
+    if file_path:
+        extension = check_file_extension(file_path)
+        if extension == "csv":
+            st.write("O arquivo é um arquivo CSV.")
+            df = pd.read_csv(file_path)  # Para CSV
+            id_dados(df)
+        elif extension == "xlsx":
+            st.write("O arquivo é um arquivo XLSX.")
+            df = pd.read_excel(file_path)  # Para XLSX
+            id_dados(df, file_path)
+        else:
+            st.write("O arquivo não possui uma extensão válida.")
+
+def id_dados(df, file_path):
+    # Processar os dados e aplicar o método WISP
+    colunas = df.columns.tolist()
+    qnt_colunas = len(colunas)
+    list_PorC = df.iloc[0].values.tolist()
+    list_Weight = df.iloc[1].values.tolist()
+    # Restante do código...
+
+def salvar(file_path):
+    # Salvar o arquivo
+    padrao = r'(.*)\\'  # Regex para capturar todo o texto antes do último caractere '\'
+    resultado = re.match(padrao, file_path)
+    if resultado:
+        caminho = resultado.group(1)
+        df_Uii.to_excel(caminho + r'\File - Wisp Ranking.xlsx', index=False)
+    else:
+        st.write('Padrão não encontrado.')
+
+def create_main_window():
+    main_window = tk.Tk()
+    main_window.withdraw()
+
+    upload_file()
+
+def main():
+    st.title("CRITIC-MOORA-3N")
+    st.write("Faça upload de um arquivo para processar os dados e aplicar o método WISP.")
+
+    create_main_window()
+
+if __name__ == "__main__":
+    main()
