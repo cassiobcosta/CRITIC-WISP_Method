@@ -1,10 +1,26 @@
-import tkinter as tk
-from tkinter import filedialog
-from tkinter import ttk
+import streamlit as st
 import re
 import pandas as pd 
 from functools import reduce
 import numpy as np
+
+def main():
+    # Seu código atual aqui
+    
+    upload_button = st.file_uploader("Upload de arquivo")
+    if upload_button is not None:
+        file_path = upload_button.name
+        extension = check_file_extension(file_path)
+        if extension == "csv":
+            st.write("O arquivo é um arquivo CSV.")
+            df = pd.read_csv(upload_button)  # Para CSV
+            id_dados(df)
+        elif extension == "xlsx":
+            st.write("O arquivo é um arquivo XLSX.")
+            df = pd.read_excel(upload_button)  # Para XLSX
+            id_dados(df, file_path)
+        else:
+            st.write("O arquivo não possui uma extensão válida.")
 
 def check_file_extension(file_path):
     if re.search(r"\.xlsx$", file_path, re.IGNORECASE):
@@ -14,25 +30,6 @@ def check_file_extension(file_path):
     else:
         return None
 
-
-def upload_file():
-    
-    filetypes = [("Arquivos CSV", "*.csv"), ("Arquivo XLSX", "*.xlsx")]
-    file_path = filedialog.askopenfilename(filetypes=filetypes)
-    
-    extension = check_file_extension(file_path)
-    if extension == "csv":
-        print("O arquivo é um arquivo XLSX.")
-        df = pd.read_csv(file_path)  # Para CSV
-        id_dados(df)
-    elif extension == "xlsx":
-        print("O arquivo é um arquivo CSV.")
-        df = pd.read_excel(file_path)  # Para XLSX
-        id_dados(df,file_path)
-    else:
-        print("O arquivo não possui uma extensão válida.")
-        
-    
 def id_dados(df, file_path):
     # Processar os dados e aplicar o método WISP
     
@@ -135,9 +132,10 @@ def id_dados(df, file_path):
     df_Uii.reset_index(inplace=False)
 
     salvar(file_path)
+    
+    st.write('Result Table:\n', df_Uii)
 
 def salvar(file_path):
-    
     # Salvar o arquivo
     
     padrao = r'(.*)/'  # Regex para capturar todo o texto antes do último caractere '\'
@@ -148,29 +146,7 @@ def salvar(file_path):
         caminho = resultado.group(1)
         df_Uii.to_excel(caminho + r'\File - Wisp Ranking.xlsx', index=False)
     else:
-        print('Padrão não encontrado.')
-    
+        st.write('Path not found.')
 
-def get_values():
-    values = []
-    for i in range(num_alternatives):
-        row_values = []
-        for j in range(num_criteria):
-            value = entry_values[i][j].get()
-            row_values.append(value)
-        values.append(row_values)
-    # Processar os valores inseridos e realizar os cálculos do método CRITIC-MOORA-3N
-
-
-def create_main_window():
-    main_window = tk.Tk()
-    main_window.title("CRITIC-MOORA-3N")
-    main_window.geometry("400x200")
-
-    upload_button = tk.Button(main_window, text="Upload de arquivo", command=upload_file)
-    upload_button.pack(pady=20)
-
-    main_window.mainloop()
-
-create_main_window()
-
+if __name__ == '__main__':
+    main()
