@@ -9,7 +9,7 @@ import re
 import pandas as pd 
 from functools import reduce
 import numpy as np
-import import openpyxl
+import openpyxl
 
 def main():
     # Seu código atual aqui
